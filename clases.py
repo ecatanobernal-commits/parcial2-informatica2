@@ -123,3 +123,63 @@ Ruta: {self.__ruta}
     def promedio_por_condicion(self, columna):
         # groupby agrupa las filas por condición y saca el promedio de cada grupo
         return self.__tabla.groupby("condition")[columna].mean()
+
+
+# ==========================================================
+# FUNCIONES DE OPERACIÓN (se le pasan como argumento al método operar)
+# ==========================================================
+def sumar(a, b):
+    return a + b
+
+
+def restar(a, b):
+    return a - b
+
+
+def multiplicar(a, b):
+    return a * b
+
+
+# ==========================================================
+# CLASE PARA LOS ARCHIVOS .MAT
+# ==========================================================
+class ArchivoMAT:
+    def __init__(self, nombre, ruta, fs=250):
+        self.__nombre = nombre
+        self.__ruta = ruta
+        self.__fs = fs                              # frecuencia de muestreo: 250 muestras por segundo
+        # whosmat da una lista con (nombre, forma, tipo) de cada variable, sin cargar los datos
+        self.__variables = sio.whosmat(ruta)
+        # loadmat devuelve un DICCIONARIO {nombre_variable: matriz}
+        dicc = sio.loadmat(ruta)
+        llave = self.__variables[0][0]              # nombre de la variable, ej. 'Visual'
+        self.__matriz = dicc[llave]                 # matriz 3D (canales, puntos, épocas)
+
+    def verNombre(self):
+        return self.__nombre
+
+    def verRuta(self):
+        return self.__ruta
+
+    def verFs(self):
+        return self.__fs
+
+    def verForma(self):
+        return self.__matriz.shape
+
+    def __str__(self):
+        texto = f"\n========== ARCHIVO MAT: {self.__nombre} ==========\n"
+        texto += f"Ruta: {self.__ruta}\n\n"
+        texto += "Variable\tDimensiones\t\tTipo\n"
+        texto += "--------------------------------------------\n"
+        for variable in self.__variables:
+            # variable = ('Visual', (64, 625, 189), 'single')
+            texto += f"{variable[0]}\t\t{variable[1]}\t\t{variable[2]}\n"
+        canales, puntos, epocas = self.__matriz.shape
+        texto += f"""
+Eje 0: {canales} canales
+Eje 1: {puntos} puntos por época ({puntos / self.__fs} s a {self.__fs} Hz)
+Eje 2: {epocas} épocas
+Tipo de dato en NumPy: {self.__matriz.dtype} (en MATLAB se llama 'single')
+"""
+        return texto
