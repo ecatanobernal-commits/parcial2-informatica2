@@ -70,3 +70,45 @@ Ruta: {self.__ruta}
 ----- describe() -----
 {self.__tabla.describe().to_string()}
 """
+
+    def graficar(self, condicion, canal, canal_x, canal_y):
+        # Máscara: nos quedamos solo con las FILAS de la condición elegida
+        datos = self.__tabla[self.__tabla["condition"] == condicion]
+
+        # Figura (la "cartulina") con 3 paneles, como en la imagen del enunciado:
+        #   add_subplot(2, 1, 1)      -> 2 filas, 1 columna: el panel de ARRIBA, ancho
+        #   add_subplot(2, 3, (4, 5)) -> 2 filas, 3 columnas: ocupa las casillas 4 y 5 (abajo izquierda)
+        #   add_subplot(2, 3, 6)      -> casilla 6 (abajo derecha)
+        fig = plt.figure(figsize=(12, 8))
+        ax1 = fig.add_subplot(2, 1, 1)
+        ax2 = fig.add_subplot(2, 3, (4, 5))
+        ax3 = fig.add_subplot(2, 3, 6)
+
+        # a) STEM: un palito por muestra. X = tiempo (el índice), altura = voltaje del canal
+        ax1.stem(datos.index, datos[canal])
+        ax1.axvline(0, color="black", label="t = 0 ms (estímulo)")   # línea vertical en 0 ms
+        ax1.set_title(f"Stem del canal {canal} - condición {condicion}")
+        ax1.set_xlabel("Tiempo (ms)")
+        ax1.set_ylabel("Amplitud (µV)")
+        ax1.legend()
+        ax1.grid(True)
+
+        # b) HISTOGRAMA del mismo canal: cuántas muestras caen en cada rango de µV
+        ax2.hist(datos[canal], bins=30)
+        ax2.set_title(f"Histograma del canal {canal}")
+        ax2.set_xlabel("Amplitud (µV)")
+        ax2.set_ylabel("Frecuencia")
+        ax2.grid(True)
+
+        # c) SCATTER de dos columnas: un punto por instante (valor de canal_x, valor de canal_y)
+        ax3.scatter(datos[canal_x], datos[canal_y])
+        ax3.set_title(f"{canal_x} vs {canal_y}")
+        ax3.set_xlabel(f"{canal_x} (µV)")
+        ax3.set_ylabel(f"{canal_y} (µV)")
+        ax3.grid(True)
+
+        fig.tight_layout()   # separa los paneles para que los textos no se encimen
+        nombre_imagen = f"{self.__nombre}_condicion{condicion}_{canal}.png"
+        fig.savefig(nombre_imagen)
+        plt.show()
+        return nombre_imagen
