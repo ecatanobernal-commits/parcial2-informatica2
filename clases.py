@@ -112,3 +112,14 @@ Ruta: {self.__ruta}
         fig.savefig(nombre_imagen)
         plt.show()
         return nombre_imagen
+
+    def diferencia_interhemisferica(self, canal_izq, canal_der):
+        # Resta columna a columna (fila por fila): izquierdo - derecho, en µV.
+        # El resultado queda guardado como una columna NUEVA de la tabla.
+        nueva = canal_izq + "-" + canal_der
+        self.__tabla[nueva] = self.__tabla[canal_izq] - self.__tabla[canal_der]
+        return nueva
+
+    def promedio_por_condicion(self, columna):
+        # groupby agrupa las filas por condición y saca el promedio de cada grupo
+        return self.__tabla.groupby("condition")[columna].mean()
