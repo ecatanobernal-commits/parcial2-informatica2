@@ -53,3 +53,20 @@ class ArchivoCSV:
 
     def verColumnas(self):
         return list(self.__tabla.columns)
+
+    def __str__(self):
+        # info() NO devuelve texto: lo imprime y devuelve None.
+        # Por eso le damos una "libreta" en memoria (StringIO) para que escriba ahí,
+        # y luego sacamos ese texto con getvalue().
+        libreta = io.StringIO()
+        self.__tabla.info(buf=libreta)
+        # to_string() muestra todas las columnas (si no, pandas las corta con "...")
+        return f"""
+========== ARCHIVO CSV: {self.__nombre} ==========
+Ruta: {self.__ruta}
+
+----- info() -----
+{libreta.getvalue()}
+----- describe() -----
+{self.__tabla.describe().to_string()}
+"""
