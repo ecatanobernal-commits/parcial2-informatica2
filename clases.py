@@ -256,3 +256,46 @@ Tipo de dato en NumPy: {self.__matriz.dtype} (en MATLAB se llama 'single')
         fig.savefig(nombre_imagen)
         plt.show()
         return promedio.shape
+
+
+# ==========================================================
+# CLASE SISTEMA (puntos extra): guarda cada objeto creado y permite buscarlo
+# ==========================================================
+class Sistema:
+    def __init__(self):
+        # Dos diccionarios {nombre: objeto}, uno para cada tipo de archivo
+        self.__csv = {}
+        self.__mat = {}
+
+    def ingresarCSV(self, archivo):
+        self.__csv[archivo.verNombre()] = archivo
+
+    def ingresarMAT(self, archivo):
+        self.__mat[archivo.verNombre()] = archivo
+
+    def verCSV(self, nombre):
+        # .get devuelve False si el nombre no está guardado
+        return self.__csv.get(nombre, False)
+
+    def verMAT(self, nombre):
+        return self.__mat.get(nombre, False)
+
+    def verNombresCSV(self):
+        return list(self.__csv.keys())
+
+    def verNombresMAT(self):
+        return list(self.__mat.keys())
+
+    def existe(self, nombre):
+        return nombre in self.__csv or nombre in self.__mat
+
+    def buscar(self, texto):
+        # Devuelve los nombres que contienen el texto (sin importar mayúsculas)
+        encontrados = []
+        for nombre in self.__csv:
+            if texto.lower() in nombre.lower():
+                encontrados.append("CSV: " + nombre)
+        for nombre in self.__mat:
+            if texto.lower() in nombre.lower():
+                encontrados.append("MAT: " + nombre)
+        return encontrados
