@@ -232,3 +232,27 @@ Tipo de dato en NumPy: {self.__matriz.dtype} (en MATLAB se llama 'single')
         fig.savefig(nombre_imagen)
         plt.show()
         return nombre_imagen
+
+    def promedio_desviacion(self, eje1, eje2):
+        # Se usa la matriz 3D ORIGINAL (sin el reshape).
+        # Los dos ejes que se ponen en axis desaparecen; queda solo el tercero.
+        promedio = np.mean(self.__matriz, axis=(eje1, eje2))
+        desviacion = np.std(self.__matriz, axis=(eje1, eje2))
+        print("Forma original de la matriz:", self.__matriz.shape)
+        print("Forma final del promedio:", promedio.shape)
+        print("Forma final de la desviación:", desviacion.shape)
+
+        # Dos boxplots en el MISMO eje
+        fig = plt.figure(figsize=(8, 6))
+        ax = fig.add_subplot(1, 1, 1)
+        ax.boxplot([promedio, desviacion])
+        ax.set_xticklabels(["Promedio", "Desviación estándar"])
+        ax.set_title(f"{self.__nombre}: promedio y desviación sobre los ejes {eje1} y {eje2}")
+        ax.set_xlabel("Medida")
+        ax.set_ylabel("Amplitud (µV)")
+        ax.grid(True)
+
+        nombre_imagen = f"{self.__nombre}_boxplot_ejes{eje1}{eje2}.png"
+        fig.savefig(nombre_imagen)
+        plt.show()
+        return promedio.shape
