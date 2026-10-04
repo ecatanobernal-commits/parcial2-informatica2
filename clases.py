@@ -28,3 +28,28 @@ def validar_opcion(mensaje, opciones):
         if texto in opciones:
             return texto
         print("Opción no válida. Opciones:", opciones)
+
+
+# ==========================================================
+# CLASE PARA LOS ARCHIVOS CSV
+# ==========================================================
+class ArchivoCSV:
+    def __init__(self, nombre, ruta):
+        self.__nombre = nombre
+        self.__ruta = ruta
+        self.__tabla = pd.read_csv(ruta)
+        # set_index devuelve una tabla NUEVA, por eso se vuelve a guardar en self.__tabla.
+        # Desde aquí 'time_ms' ya no es columna: es el índice de las filas.
+        self.__tabla = self.__tabla.set_index("time_ms")
+
+    def verNombre(self):
+        return self.__nombre
+
+    def verRuta(self):
+        return self.__ruta
+
+    def verTabla(self):
+        return self.__tabla
+
+    def verColumnas(self):
+        return list(self.__tabla.columns)
