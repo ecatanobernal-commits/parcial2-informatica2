@@ -183,3 +183,52 @@ Eje 2: {epocas} épocas
 Tipo de dato en NumPy: {self.__matriz.dtype} (en MATLAB se llama 'single')
 """
         return texto
+
+    def matriz2D(self):
+        # (canales, puntos, épocas) -> (canales, puntos * épocas)
+        # order="F" pone las épocas una detrás de otra (como una señal continua).
+        canales, puntos, epocas = self.__matriz.shape
+        return np.reshape(self.__matriz, (canales, puntos * epocas), order="F")
+
+    def operar(self, funcion, canales, pmin, pmax):
+        # funcion: sumar, restar o multiplicar (se recibe la FUNCIÓN, sin paréntesis)
+        # canales: lista con los 4 canales elegidos, ej. [0, 10, 20, 30]
+        # pmin, pmax: rango de puntos de la matriz 2D (pmax no se incluye)
+        matriz = self.matriz2D()
+        tiempo = np.arange(pmin, pmax) / self.__fs      # eje X en segundos
+
+        # resultado = c1 (op) c2 (op) c3 (op) c4
+        resultado = matriz[canales[0], pmin:pmax]
+        for c in canales[1:]:
+            resultado = funcion(resultado, matriz[c, pmin:pmax])
+
+        # Al multiplicar 4 voltajes las unidades quedan en µV^4
+        if funcion == multiplicar:
+            unidad = "µV⁴"
+        else:
+            unidad = "µV"
+
+        fig = plt.figure(figsize=(12, 8))
+        ax1 = fig.add_subplot(2, 1, 1)
+        ax2 = fig.add_subplot(2, 1, 2)
+
+        for c in canales:
+            ax1.plot(tiempo, matriz[c, pmin:pmax], label=f"Canal {c}")
+        ax1.set_title(f"Canales {canales} - puntos {pmin} a {pmax}")
+        ax1.set_xlabel("Tiempo (s)")
+        ax1.set_ylabel("Amplitud (µV)")
+        ax1.legend()
+        ax1.grid(True)
+
+        ax2.plot(tiempo, resultado, color="black", label=f"Resultado de {funcion.__name__}")
+        ax2.set_title(f"Resultado de {funcion.__name__} de los canales {canales}")
+        ax2.set_xlabel("Tiempo (s)")
+        ax2.set_ylabel(f"Amplitud ({unidad})")
+        ax2.legend()
+        ax2.grid(True)
+
+        fig.tight_layout()
+        nombre_imagen = f"{self.__nombre}_{funcion.__name__}_{pmin}-{pmax}.png"
+        fig.savefig(nombre_imagen)
+        plt.show()
+        return nombre_imagen
