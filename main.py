@@ -13,7 +13,7 @@ def cargar_csv(sis):
         print("No se encontró el archivo, revise la ruta")
         return
     sis.ingresarCSV(archivo)
-    print(archivo)          # llama a __str__ (info y describe)
+    print(archivo)
 
 
 def cargar_mat(sis):
@@ -28,7 +28,7 @@ def cargar_mat(sis):
         print("No se encontró el archivo, revise la ruta")
         return
     sis.ingresarMAT(archivo)
-    print(archivo)          # llama a __str__ (whosmat)
+    print(archivo)
 
 
 def menu_csv(archivo):
@@ -93,7 +93,7 @@ def menu_mat(archivo):
                 funcion = multiplicar
 
             canales, puntos, epocas = archivo.verForma()
-            total = puntos * epocas        # número de puntos de la matriz 2D
+            total = puntos * epocas
             lista_canales = []
             for i in range(4):
                 c = validar_entero(f"Canal {i + 1} (0 a {canales - 1}): ", 0, canales - 1)
